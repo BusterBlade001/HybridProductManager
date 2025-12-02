@@ -17,7 +17,8 @@ class HomeViewModel(private val repository: ProductoRepository) : ViewModel() {
         checkLocalData()
     }
 
-    private fun checkLocalData() {
+    // Hacemos esta función pública para que la Activity pueda llamarla al reanudarse.
+    fun checkLocalData() { // <-- CAMBIO DE ACCESO (ANTES ERA private)
         viewModelScope.launch {
             _hasLocalData.value = repository.hasLocalData()
         }

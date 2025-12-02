@@ -31,7 +31,15 @@ class HomeActivity : AppCompatActivity() {
 
         setupListeners()
         setupObservers()
+        // NOTA: El check inicial ya se hace en el init del ViewModel.
     }
+
+    // <-- CAMBIO: Añadimos onResume para verificar el estado de la BD local
+    override fun onResume() {
+        super.onResume()
+        viewModel.checkLocalData()
+    }
+    // CAMBIO -->
 
     private fun setupListeners() {
         binding.btnLoadApi.setOnClickListener {

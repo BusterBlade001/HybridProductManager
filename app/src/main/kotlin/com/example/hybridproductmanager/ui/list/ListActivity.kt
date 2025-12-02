@@ -56,9 +56,14 @@ class ListActivity : AppCompatActivity() {
     private fun setupObservers() {
         viewModel.productos.observe(this) { productos ->
             adapter.submitList(productos)
-            // Mostrar/Ocultar el botón de guardar solo si los datos vienen de la API
-            binding.btnSaveLocal.visibility = View.VISIBLE // Forzar visibilidad para la prueba
+            // Lógica de visibilidad del botón de guardar ELIMINADA de aquí.
         }
+
+        // <-- CAMBIO: Nuevo observador que gestiona la visibilidad del botón
+        viewModel.isDataFromApi.observe(this) { isFromApi ->
+            binding.btnSaveLocal.visibility = if (isFromApi) View.VISIBLE else View.GONE
+        }
+        // CAMBIO -->
 
         viewModel.isLoading.observe(this) { isLoading ->
             binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE

@@ -21,23 +21,25 @@ class ListViewModel(private val repository: ProductoRepository) : ViewModel() {
     val message: LiveData<String?> = _message
 
     // Bandera para saber si los datos actuales provienen de la API o de la BD local
-    var isDataFromApi: Boolean = false
+    private val _isDataFromApi = MutableLiveData(false) // <-- CAMBIO: LiveData privado
+    val isDataFromApi: LiveData<Boolean> = _isDataFromApi // <-- CAMBIO: LiveData observable
 
     /**
      * Carga los productos desde la API REST.
      */
     fun loadProductosFromApi() {
         _isLoading.value = true
+        _isDataFromApi.value = false // Ocultar antes de empezar
         viewModelScope.launch {
             val result = repository.getProductosFromApi()
             _isLoading.value = false
             if (result != null) {
                 _productos.value = result
-                isDataFromApi = true
+                _isDataFromApi.value = true // <-- CAMBIO: Se actualiza el LiveData
                 _message.value = "Productos cargados desde la API REST."
             } else {
                 _productos.value = emptyList()
-                isDataFromApi = false
+                _isDataFromApi.value = false // <-- CAMBIO: Se actualiza el LiveData
                 _message.value = "Error al cargar productos desde la API. Verifique su conexión."
             }
         }
@@ -48,11 +50,12 @@ class ListViewModel(private val repository: ProductoRepository) : ViewModel() {
      */
     fun loadProductosFromLocalDb() {
         _isLoading.value = true
+        _isDataFromApi.value = false // Ocultar antes de empezar
         viewModelScope.launch {
             repository.getProductosLocal().collect { list ->
                 _productos.value = list
                 _isLoading.value = false
-                isDataFromApi = false
+                _isDataFromApi.value = false // <-- CAMBIO: Se actualiza el LiveData
                 _message.value = "Productos cargados desde la Base de Datos Local."
             }
         }
